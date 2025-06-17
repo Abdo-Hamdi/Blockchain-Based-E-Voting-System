@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+# Flask stuff:
+instance/
+.webassets-cache
+# Jupyter Notebook
+.ipynb_checkpoints
+# Environments
+.env
+.venv
+env/
+venv/
+# PyCharm
+.idea/
+# Visual Studio Code
+.vscode/

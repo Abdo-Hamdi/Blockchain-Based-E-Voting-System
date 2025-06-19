@@ -19,3 +19,9 @@ venv/
 .idea/
 # Visual Studio Code
 .vscode/
+*.pdf
+*.pptx
+*.doc
+*.docx
+*.word
+Data/

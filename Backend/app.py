@@ -1,25 +1,15 @@
-from flask import Flask, request, jsonify
-import tempfile
-import os
-import logging
+from config import *
 from face_auth import FaceAuthenticator
-from flasgger import Swagger
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 face_auth = FaceAuthenticator()
-app.config['SWAGGER'] = {
-    'title': 'Face Authentication API',
-    'uiversion': 3,
-    'specs_route': '/apidocs/'
-}
-Swagger(app)
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
-SIMILARITY_THRESHOLD = 0.7
+app.config.from_object('config')
+# Swagger(app, config=app.config["SWAGGER"])
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
 
 @app.route('/')
 def home():
@@ -138,7 +128,7 @@ def login():
         
         similarity = face_auth.compare_embeddings(stored_embedding, login_embedding)
         
-        if similarity >= SIMILARITY_THRESHOLD:
+        if similarity >= app.config["SIMILARITY_THRESHOLD"]:
             return jsonify({
                 "access": "granted",
                 "similarity": float(similarity)
@@ -165,4 +155,4 @@ def login():
                 logger.error(f"Temp file deletion failed: {str(e)}")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(port=app.config["PORT"], debug=app.config["DEBUG"])

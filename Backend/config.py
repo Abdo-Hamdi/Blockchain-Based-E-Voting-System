@@ -33,5 +33,5 @@ mtcnn = MTCNN(
     min_face_size=MIN_IMAGE_SIZE
 )
 INCEPTION_MODEL = InceptionResnetV1(classify=False, pretrained='vggface2').to(DEVICE).eval()
-YOLO_MODEL_1 = YOLO(r".\Backend\models\detect_id_inside_image.pt")
-YOLO_MODEL_2 = YOLO(r".\Backend\models\detect_field_inside_id.pt")
+YOLO_MODEL_1 = YOLO(r"Models\ID Detection & Field Extraction\detect_id_inside_image.pt")
+YOLO_MODEL_2 = YOLO(r"Models\ID Detection & Field Extraction\detect_field_inside_id.pt")

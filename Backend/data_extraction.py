@@ -8,6 +8,8 @@ class ImageExtractor:
         self.model1 = YOLO_MODEL_1
         self.mtcnn = mtcnn
         self.model2 = YOLO_MODEL_2
+        self.fake_model = FAKE_MODEL
+        self.IMAGE_SIZE = 96
         logger.info(f"Using device: {self.device}")
 
     def load_image(self, image_path: str) -> Optional[Image.Image]:
@@ -16,8 +18,8 @@ class ImageExtractor:
                 logger.error(f"Image not found: {image_path}")
                 return None 
             img = Image.open(image_path).convert('RGB')
-            if min(img.size) < MIN_IMAGE_SIZE * 12:
-                logger.warning(f"Image too small: {img.size}")
+            if img is None or min(img.size) < MIN_IMAGE_SIZE:
+                logger.warning(f"Image not exists: {image_path}")
                 return None
             return img
         except Exception as e:
@@ -40,12 +42,12 @@ class ImageExtractor:
             logger.error(f"ID detection failed: {str(e)}")
             return None
 
-    def extract_image(self, image_path: str) -> Optional[Image.Image]:
+    def extract_id(self, image_path: str) -> Optional[Image.Image]:
         try:
             img = self.load_image(image_path)
             if img is None:
                 return None
-            if min(img.size) < MIN_IMAGE_SIZE * 3:
+            if min(img.size) < MIN_IMAGE_SIZE * 3 and min(img.size) > MIN_IMAGE_SIZE:
                 if img.width < 150:
                     img = img.resize((150, img.height), Image.BILINEAR)
                 elif img.height < 100:
@@ -82,16 +84,93 @@ class ImageExtractor:
                     logger.error("No image provided for field extraction")
                     return None
                 result = self.model2(np.array(image), verbose=False)
-                boxes = result[0].boxes.xyxy.cpu().numpy() if len(result) > 0 else []
-                if len(boxes) == 0:
-                    logger.warning("No fields detected")
-                    return None
-                field_images = []
-                for box in boxes:
-                    x1, y1, x2, y2 = map(int, box)
-                    field_crop = image.crop((x1, y1, x2, y2))
-                    field_images.append(field_crop)
-                return field_images
+                boxes = result[0].boxes
+                for i in range(len(boxes)):
+                    class_id = int(boxes.cls[i])
+                    if class_id == ID_NUMBER_CLASS:
+                        x1, y1, x2, y2 = map(int, boxes.xyxy[i])
+                        field_crop = image.crop((x1, y1, x2, y2))
+                        return field_crop
+                logger.warning("National ID field not detected")
+                return None
         except Exception as e:
             logger.error(f"Field detection failed: {str(e)}")
             return None
+
+    def load_balanced_image(self, image: Image.Image) -> Optional[np.ndarray]:
+        try:
+            img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
+            if img is None:
+                return None
+            img = cv2.resize(img, (self.IMAGE_SIZE, self.IMAGE_SIZE))
+            img = cv2.merge([img]*3)
+            img = img.astype(np.float32)
+            img = (img / 127.5) - 1.0
+            return img
+        except Exception as e:
+            logger.error(f"Error Processing image: {str(e)}")
+            return None
+
+    def apply_balanced_ela(self, image: Image.Image) -> Optional[np.ndarray]:
+        try:
+            original = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
+            if original is None:
+                return None
+            original = cv2.resize(original, (self.IMAGE_SIZE, self.IMAGE_SIZE))
+            original_rgb = cv2.merge([original]*3)
+            _, encoded = cv2.imencode('.jpg', original, [cv2.IMWRITE_JPEG_QUALITY, ELA_QUALITY])
+            compressed = cv2.imdecode(encoded, cv2.IMREAD_GRAYSCALE)
+            compressed = cv2.resize(compressed, (self.IMAGE_SIZE, self.IMAGE_SIZE))
+            compressed_rgb = cv2.merge([compressed]*3)
+            diff = 255 - cv2.absdiff(original_rgb, compressed_rgb)
+            return (diff * ELA_SCALE_FACTOR).astype(np.float32) / 255.0
+        except Exception as e:
+            logger.error(f"ELA failed: {str(e)}")
+            return None
+
+    def apply_lbp(self, image: Image.Image) -> Optional[np.ndarray]:
+        try:
+            gray = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
+            if gray is None:
+                return None
+            gray = cv2.resize(gray, (self.IMAGE_SIZE, self.IMAGE_SIZE))
+            lbp = local_binary_pattern(gray, P=LBP_POINTS, R=LBP_RADIUS, method='uniform')
+            lbp_normalized = (lbp - lbp.min()) / (lbp.max() - lbp.min())
+            lbp_rgb = cv2.merge([lbp_normalized.astype(np.float32)]*3)
+            return lbp_rgb
+        except Exception as e:
+            logger.error(f"LBP failed: {str(e)}")
+            return None
+
+    def predict_fake(self, image: Image.Image, threshold: float = REAL_THRESHOLD):
+        try:
+            if image is None:
+                logger.error("No image provided")
+                return 0.0, False, 0.0
+            img1 = self.load_balanced_image(image)
+            if img1 is None:
+                return 0.0, False, 0.0
+            img1 = np.expand_dims(img1, axis=0)
+
+            img2 = self.apply_balanced_ela(image)
+            if img2 is None:
+                return 0.0, False, 0.0
+            img2 = np.expand_dims(img2, axis=0)
+
+            img3 = self.apply_lbp(image)
+            if img3 is None:
+                return 0.0, False, 0.0
+            img3 = np.expand_dims(img3, axis=0)
+
+            prediction = self.fake_model.predict({
+                'original_input': img1,
+                'ela_input': img2,
+                'lbp_input': img3
+                })[0][0]
+            result = True if prediction > threshold else False
+            logger.info(f"Prediction: {prediction}, Result: {'Real' if result else 'Fake'}")
+            confidence = max(prediction, 1 - prediction) * 100
+            return float(prediction), result, confidence
+        except Exception as e:
+            logger.error(f"Prediction failed: {str(e)}")
+            return 0.0, False, 0.0

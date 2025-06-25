@@ -174,3 +174,59 @@ class ImageExtractor:
         except Exception as e:
             logger.error(f"Prediction failed: {str(e)}")
             return 0.0, False, 0.0
+    
+    def simple_threshold(self, image: Image.Image) -> Optional[np.ndarray]:
+        if image is None:
+            logger.error("No image provided for OCR")
+            return None
+        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV)
+        threshold = cv2.cvtColor(thresh, cv2.COLOR_GRAY2RGB)
+        return threshold
+
+    def convert_digits(self, text) -> str:
+        return ''.join([DIGIT_MAP.get(c, '') for c in text if c in DIGIT_MAP])
+
+    def run_ocr(self, image: Image.Image) -> str:
+        if image is None:
+            logger.error("No image provided for OCR")
+            return ""
+        try:
+            image_np = np.array(image)
+            # If image is already RGB, skip conversion, else convert as needed
+            if image_np.shape[-1] == 3:
+                image_rgb = image_np
+            else:
+                image_rgb = cv2.cvtColor(image_np, cv2.COLOR_GRAY2RGB)
+            processed = self.simple_threshold(image_rgb)
+            processed = cv2.resize(processed, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+
+            results = READER.readtext(
+                processed,
+                paragraph=True,
+                batch_size=4,
+                width_ths=1.5,
+                text_threshold=0.4,
+                allowlist=''.join(DIGIT_MAP.keys())
+            )
+            full_number = ""
+            arabic_number = ""
+
+            if results:
+                best_result = max(results, key=lambda x: len(self.convert_digits(x[1])))
+                arabic_number = best_result[1]
+                full_number = self.convert_digits(arabic_number)
+                if len(full_number) < 14:
+                    logger.warning("Detected number is too short, likely not a valid ID number")
+                    full_number = "" 
+
+            logger.info("\n=== OCR RESULTS ===")
+            if full_number:
+                logger.info(f"Raw Detection: {arabic_number}")
+                logger.info(f"Converted Number: {full_number}")
+            else:
+                logger.warning("No valid number detected")
+            return full_number
+        except Exception as e:
+            logger.error(f"OCR failed: {str(e)}")
+            return ""

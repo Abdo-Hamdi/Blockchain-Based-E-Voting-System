@@ -47,34 +47,22 @@ class ImageExtractor:
             img = self.load_image(image_path)
             if img is None:
                 return None
-            if min(img.size) < MIN_IMAGE_SIZE * 3 and min(img.size) > MIN_IMAGE_SIZE:
-                if img.width < 150:
-                    img = img.resize((150, img.height), Image.BILINEAR)
-                elif img.height < 100:
-                    img = img.resize((img.width, 100), Image.BILINEAR)
-                else:
-                    img = img.resize((150, 100), Image.BILINEAR)
+            min_width, min_height = 400, 200
+            width, height = img.size
+            if width < min_width or height < min_height:
+                scale_w = min_width / width
+                scale_h = min_height / height
+                scale = max(scale_w, scale_h)
+                new_width = max(int(width * scale), min_width)
+                new_height = max(int(height * scale), min_height)
+                img = img.resize((new_width, new_height), Image.BILINEAR)
+                logger.info(f"Resized image to: {img.size}")
             id_crop = self.detect_id(img)
             if id_crop is None:
                 return None        
             return id_crop
         except Exception as e:
             logger.error(f"Image extraction failed: {str(e)}")
-            return None
-
-    def extract_face(self, image: Image.Image) -> Optional[torch.Tensor]:
-        try:
-            with torch.no_grad():
-                if image is None:
-                    logger.error("No image provided for face extraction")
-                    return None
-                face_tensor = self.mtcnn(image)
-                if face_tensor is None:
-                    logger.warning("No face detected")
-                    return None
-                return face_tensor
-        except Exception as e:
-            logger.error(f"Face detection failed: {str(e)}")
             return None
 
     def extract_field(self, image: Image.Image) -> Optional[list]:
@@ -175,10 +163,7 @@ class ImageExtractor:
             logger.error(f"Prediction failed: {str(e)}")
             return 0.0, False, 0.0
     
-    def simple_threshold(self, image: Image.Image) -> Optional[np.ndarray]:
-        if image is None:
-            logger.error("No image provided for OCR")
-            return None
+    def simple_threshold(self, image: np.ndarray) -> np.ndarray:
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
         _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV)
         threshold = cv2.cvtColor(thresh, cv2.COLOR_GRAY2RGB)
@@ -187,13 +172,12 @@ class ImageExtractor:
     def convert_digits(self, text) -> str:
         return ''.join([DIGIT_MAP.get(c, '') for c in text if c in DIGIT_MAP])
 
-    def run_ocr(self, image: Image.Image) -> str:
+    def run_ocr(self, image: Image.Image, text_threshold: float = 0.4) -> str:
         if image is None:
             logger.error("No image provided for OCR")
             return ""
         try:
             image_np = np.array(image)
-            # If image is already RGB, skip conversion, else convert as needed
             if image_np.shape[-1] == 3:
                 image_rgb = image_np
             else:
@@ -206,7 +190,7 @@ class ImageExtractor:
                 paragraph=True,
                 batch_size=4,
                 width_ths=1.5,
-                text_threshold=0.4,
+                text_threshold=text_threshold,
                 allowlist=''.join(DIGIT_MAP.keys())
             )
             full_number = ""

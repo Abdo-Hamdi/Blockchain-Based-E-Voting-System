@@ -3,7 +3,7 @@ import warnings
 import torch
 import logging
 import numpy as np
-from typing import Optional
+from typing import Optional, Tuple
 from ultralytics import YOLO
 from PIL import Image, ImageDraw
 from facenet_pytorch import MTCNN, InceptionResnetV1
@@ -20,7 +20,7 @@ DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 SIMILARITY_THRESHOLD = 0.7
 REAL_THRESHOLD = 0.75
-MIN_IMAGE_SIZE = 40
+MIN_IMAGE_SIZE = 100
 ID_NUMBER_CLASS = 6
 IMAGE_SIZE = 160
 ELA_QUALITY = 85
@@ -40,7 +40,7 @@ mtcnn = MTCNN(
     margin=14,
     device=DEVICE,
     selection_method='center_weighted_size',
-    min_face_size=MIN_IMAGE_SIZE
+    min_face_size=40
 )
 DIGIT_MAP = {
     '٠': '0', '۰': '0', '١': '1', '۱': '1',

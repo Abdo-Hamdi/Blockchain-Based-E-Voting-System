@@ -34,11 +34,16 @@ class FaceAuthenticator:
             logger.error(f"Face detection failed: {str(e)}")
             return None
 
-    def create_embedding(self, image_path: str) -> Optional[np.ndarray]:
+    def create_embedding(self, image, path: bool = True) -> Optional[np.ndarray]:
         try:
-            img = self.load_image(image_path)
-            if img is None:
-                return None
+            if path:
+                img = self.load_image(image)
+                if img is None:
+                    return None
+            else:
+                img = image
+                if img is None:
+                    return None
 
             face_tensor = self.detect_face(img)
             if face_tensor is None:
@@ -52,7 +57,7 @@ class FaceAuthenticator:
             return None
 
     @staticmethod
-    def compare_embeddings(emb1: np.ndarray, emb2: np.ndarray, threshold: float = SIMILARITY_THRESHOLD) -> float:
+    def compare_embeddings(emb1: np.ndarray, emb2: np.ndarray, threshold: float = SIMILARITY_THRESHOLD) -> Tuple[float, bool]:
         try:
             emb1 = np.asarray(emb1).flatten()
             emb2 = np.asarray(emb2).flatten()

@@ -16,7 +16,7 @@ def allowed_file(filename):
 @app.route('/')
 def home():
     return jsonify({
-        "api": "Face Authentication",
+        "api": "Blockchain Based E-Voting System",
         "version": "1.0",
         "status": "running",
         "docs": "/apidocs",
@@ -25,29 +25,6 @@ def home():
 
 @app.route('/register', methods=['POST'])
 def register():
-    """Register a new user
-    ---
-    tags:
-      - Authentication
-    consumes:
-      - multipart/form-data
-    parameters:
-      - name: face_image
-        in: formData
-        type: file
-        required: true
-        description: Face image for registration
-      - name: user_address
-        in: formData
-        type: string
-        required: true
-        description: User's blockchain address
-    responses:
-      200:
-        description: Registration successful
-      400:
-        description: Invalid input
-    """
     if 'face_image' not in request.files or 'nid_image' not in request.files:
         logger.error("Missing image file(s) in request")
         return jsonify({"error": "Both face_image and nid_image are required"}), 400
@@ -134,54 +111,6 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    """Authenticate user via face recognition
-    ---
-    tags:
-      - Authentication
-    consumes:
-      - multipart/form-data
-    parameters:
-      - name: face_image
-        in: formData
-        type: file
-        required: true
-        description: Face image for login
-      - name: user_address
-        in: formData
-        type: string
-        required: true
-        description: User's blockchain address
-    responses:
-      200:
-        description: Authentication successful
-        schema:
-          type: object
-          properties:
-            access:
-              type: string
-              example: "granted"
-            similarity:
-              type: number
-              example: 0.85
-      401:
-        description: Authentication failed
-        schema:
-          type: object
-          properties:
-            access:
-              type: string
-              example: "denied"
-            similarity:
-              type: number
-              example: 0.45
-            reason:
-              type: string
-              example: "Low similarity score"
-      400:
-        description: Bad request
-      500:
-        description: Internal server error
-    """
     if 'face_image' not in request.files:
         logger.error("No image file in request")
         return jsonify({"error": "No image provided"}), 400

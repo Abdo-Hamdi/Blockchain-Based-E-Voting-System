@@ -65,7 +65,7 @@ class ImageExtractor:
             logger.error(f"Image extraction failed: {str(e)}")
             return None
 
-    def extract_field(self, image: Image.Image) -> Optional[list]:
+    def extract_field(self, image: Image.Image) -> Optional[Image.Image]:
         try:
             with torch.no_grad():
                 if image is None:
@@ -134,35 +134,34 @@ class ImageExtractor:
         try:
             if image is None:
                 logger.error("No image provided")
-                return 0.0, False, 0.0
+                return 0.0, False
             img1 = self.load_balanced_image(image)
             if img1 is None:
-                return 0.0, False, 0.0
+                return 0.0, False
             img1 = np.expand_dims(img1, axis=0)
 
             img2 = self.apply_balanced_ela(image)
             if img2 is None:
-                return 0.0, False, 0.0
+                return 0.0, False
             img2 = np.expand_dims(img2, axis=0)
 
             img3 = self.apply_lbp(image)
             if img3 is None:
-                return 0.0, False, 0.0
+                return 0.0, False
             img3 = np.expand_dims(img3, axis=0)
 
             prediction = self.fake_model.predict({
                 'original_input': img1,
                 'ela_input': img2,
                 'lbp_input': img3
-                })[0][0]
-            result = True if prediction > threshold else False
+                }, verbose=0)[0][0]
+            result = True if prediction >= threshold else False
             logger.info(f"Prediction: {prediction}, Result: {'Real' if result else 'Fake'}")
-            confidence = max(prediction, 1 - prediction) * 100
-            return float(prediction), result, confidence
+            return float(prediction), result
         except Exception as e:
             logger.error(f"Prediction failed: {str(e)}")
-            return 0.0, False, 0.0
-    
+            return 0.0, False
+
     def simple_threshold(self, image: np.ndarray) -> np.ndarray:
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
         _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV)

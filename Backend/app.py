@@ -58,6 +58,13 @@ def register():
         if id_crop is None:
             return jsonify({"error": "Could not detect ID card in national ID image"}), 400
 
+        prediction, result = extractor.predict_fake(id_crop)
+        if not result:
+            return jsonify({
+                "error": "National ID image is detected as fake",
+                "confidence": float(prediction)
+            }), 400
+
         nid_field = extractor.extract_field(id_crop)
         if nid_field is None:
             return jsonify({"error": "Could not detect ID number field in national ID image"}), 400

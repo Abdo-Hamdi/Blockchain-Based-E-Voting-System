@@ -1,79 +1,48 @@
-absl-py==2.3.0
-astunparse==1.6.3
-blinker==1.9.0
-certifi==2025.6.15
-charset-normalizer==3.4.2
-click==8.2.1
-colorama==0.4.6
-contourpy==1.3.2
-cycler==0.12.1
-easyocr==1.7.2
-facenet-pytorch==2.6.0
-filelock==3.18.0
-Flask==3.1.1
-flatbuffers==25.2.10
-fonttools==4.58.4
-fsspec==2025.5.1
-gast==0.6.0
-google-pasta==0.2.0
-grpcio==1.73.0
-h5py==3.14.0
-idna==3.10
-imageio==2.37.0
-itsdangerous==2.2.0
-Jinja2==3.1.6
-keras==3.10.0
-kiwisolver==1.4.8
-lazy_loader==0.4
-libclang==18.1.1
-Markdown==3.8.2
-markdown-it-py==3.0.0
-MarkupSafe==3.0.2
-matplotlib==3.10.3
-mdurl==0.1.2
-ml_dtypes==0.5.1
-mpmath==1.3.0
-namex==0.1.0
-networkx==3.4.2
-ninja==1.11.1.4
-numpy==1.26.4
-opencv-python==4.11.0.86
-opencv-python-headless==4.11.0.86
-opt_einsum==3.4.0
-optree==0.16.0
-packaging==25.0
-pandas==2.3.0
-pillow==10.2.0
-protobuf==5.29.5
-psutil==7.0.0
-py-cpuinfo==9.0.0
-pyclipper==1.3.0.post6
-Pygments==2.19.1
-pyparsing==3.2.3
-python-bidi==0.6.6
-python-dateutil==2.9.0.post0
-pytz==2025.2
-PyYAML==6.0.2
-requests==2.32.3
-rich==14.0.0
-scikit-image==0.25.2
-scipy==1.15.3
-shapely==2.1.1
-six==1.17.0
-sympy==1.14.0
-tensorboard==2.19.0
-tensorboard-data-server==0.7.2
-tensorflow==2.19.0
-tensorflow-io-gcs-filesystem==0.31.0
-termcolor==3.1.0
-tifffile==2025.5.10
-torch==2.2.0
-torchvision==0.17.0
-tqdm==4.67.1
-typing_extensions==4.14.0
-tzdata==2025.2
-ultralytics==8.3.156
-ultralytics-thop==2.0.14
-urllib3==2.5.0
-Werkzeug==3.1.3
-wrapt==1.17.2
+# Core Flask Application
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# Computer Vision and Image Processing
+opencv-python==4.8.1.78
+Pillow==10.0.1
+scikit-image==0.21.0
+
+# Deep Learning Frameworks
+torch==2.0.1
+torchvision==0.15.2
+tensorflow==2.13.0
+
+# Face Recognition
+facenet-pytorch==2.5.3
+
+# Object Detection
+ultralytics==8.0.186
+
+# OCR (Optical Character Recognition)
+easyocr==1.7.0
+
+# Scientific Computing
+numpy==1.24.3
+scipy==1.11.2
+
+# Data Visualization (optional, for debugging)
+matplotlib==3.7.2
+
+# HTTP Requests (for model downloads)
+requests==2.31.0
+
+# Progress Bars
+tqdm==4.66.1
+
+# CUDA Support (optional, install based on your system)
+# torch-audio==2.0.2  # Uncomment if needed
+# torchtext==0.15.2   # Uncomment if needed
+
+# Development Dependencies (optional)
+# pytest==7.4.2
+# pytest-cov==4.1.0
+# flake8==6.0.0
+# black==23.7.0
+
+# Note: For GPU support, install PyTorch with CUDA support
+# For Linux, you may need additional OpenCV system dependencies

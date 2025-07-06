@@ -4,6 +4,10 @@
 
 This directory contains the AI-powered backend services for the blockchain-based e-voting system. The backend provides secure face verification, ID authentication, and fraud detection capabilities using advanced computer vision and machine learning techniques.
 
+## 🔗 Related Repositories
+
+- [Blockchain Smart Contract](https://github.com/suhail-abdelaal/Blockchain-based-eVoting)
+
 ## Features
 
 - **Face Recognition**: Extract and compare facial embeddings using InceptionResnetV1

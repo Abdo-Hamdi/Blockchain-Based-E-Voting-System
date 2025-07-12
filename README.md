@@ -449,21 +449,15 @@ Ctrl+C
 ``` 
 ## Contributors
 
-<a href="https://github.com/suhail-abdelaal/Blockchain-Based-E-Voting-System/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=suhail-abdelaal/Blockchain-Based-E-Voting-System" />
+<a href="https://github.com/suhail-abdelaal">
+  <img src="https://avatars.githubusercontent.com/suhail-abdelaal" width="60" style="border-radius: 50%;" />
 </a>
-
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-  <a href="https://github.com/suhail-abdelaal">
-    <img src="https://avatars.githubusercontent.com/suhail-abdelaal" width="50" style="border-radius: 50% !important;"/>
-  </a>
-  <a href="https://github.com/hebashaaban23">
-    <img src="https://avatars.githubusercontent.com/hebashaaban23" width="50" style="border-radius: 50% !important;"/>
-  </a>
-  <a href="https://github.com/HabibaKader">
-    <img src="https://avatars.githubusercontent.com/HabibaKader" width="50" style="border-radius: 50% !important;"/>
-  </a>
-  <a href="https://github.com/Abdulrahmanelashry">
-    <img src="https://avatars.githubusercontent.com/Abdulrahmanelashry" width="50" style="border-radius: 50% !important;"/>
-  </a>
-</div>
+<a href="https://github.com/hebashaaban23">
+  <img src="https://avatars.githubusercontent.com/hebashaaban23" width="60" style="border-radius: 50%;" />
+</a>
+<a href="https://github.com/HabibaKader">
+  <img src="https://avatars.githubusercontent.com/HabibaKader" width="60" style="border-radius: 50%;" />
+</a>
+<a href="https://github.com/Abdulrahmanelashry">
+  <img src="https://avatars.githubusercontent.com/Abdulrahmanelashry" width="60" style="border-radius: 50%;" />
+</a>

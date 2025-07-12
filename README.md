@@ -449,11 +449,21 @@ Ctrl+C
 ``` 
 ## Contributors
 
+<a href="https://github.com/suhail-abdelaal/Blockchain-Based-E-Voting-System/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=suhail-abdelaal/Blockchain-Based-E-Voting-System" />
+</a>
+
 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
   <a href="https://github.com/suhail-abdelaal">
-    <img src="https://github.com/suhail-abdelaal.png" width="50" style="border-radius: 50%;"/>
+    <img src="https://avatars.githubusercontent.com/suhail-abdelaal" width="50" style="border-radius: 50% !important;"/>
   </a>
   <a href="https://github.com/hebashaaban23">
-    <img src="https://github.com/hebashaaban23.png" width="50" style="border-radius: 50%;"/>
+    <img src="https://avatars.githubusercontent.com/hebashaaban23" width="50" style="border-radius: 50% !important;"/>
+  </a>
+  <a href="https://github.com/HabibaKader">
+    <img src="https://avatars.githubusercontent.com/HabibaKader" width="50" style="border-radius: 50% !important;"/>
+  </a>
+  <a href="https://github.com/Abdulrahmanelashry">
+    <img src="https://avatars.githubusercontent.com/Abdulrahmanelashry" width="50" style="border-radius: 50% !important;"/>
   </a>
 </div>
